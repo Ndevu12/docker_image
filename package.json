@@ -1,0 +1,31 @@
+{
+  "name": "docker-learning-server",
+  "version": "1.0.0",
+  "description": "A simple Node.js server for learning Docker containerization",  "main": "src/app.js",  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "docker:build": "docker build -t docker-learning-server .",
+    "docker:run": "docker run -p 3000:3000 docker-learning-server",
+    "docker:run:dev": "docker run -p 3000:3000 -v ${PWD}:/app docker-learning-server npm run dev",
+    "compose:up": "docker-compose up -d",
+    "compose:down": "docker-compose down"
+  },
+  "keywords": [
+    "docker",
+    "nodejs",
+    "express",
+    "learning",
+    "containerization"
+  ],
+  "author": "Docker Learning Project",
+  "license": "MIT",  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  }
+}

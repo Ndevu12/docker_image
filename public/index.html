@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Docker Learning Server</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .endpoint {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+
+        .method {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            margin-right: 10px;
+        }
+
+        .get { background: #28a745; color: white; }
+        .post { background: #007bff; color: white; }
+        .put { background: #ffc107; color: black; }
+        .delete { background: #dc3545; color: white; }
+
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .healthy { background: #d4edda; color: #155724; }
+        .info { background: #d1ecf1; color: #0c5460; }
+
+        button {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .response {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .loading {
+            color: #667eea;
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🐳 Docker Learning Server</h1>
+            <p>A comprehensive Node.js application for learning Docker containerization</p>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <h2>🏥 System Health</h2>
+                <div id="health-status">
+                    <span class="loading">Loading...</span>
+                </div>
+                <button onclick="checkHealth()">Refresh Health</button>
+                <div id="health-response" class="response" style="display: none;"></div>
+            </div>
+
+            <div class="card">
+                <h2>💻 System Information</h2>
+                <button onclick="getSystemInfo()">Get System Info</button>
+                <div id="system-response" class="response" style="display: none;"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>🛠 Available API Endpoints</h2>
+            
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <strong>/</strong> - Welcome message and API overview
+                <button onclick="testEndpoint('/', 'GET')">Test</button>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <strong>/health</strong> - Health check endpoint
+                <button onclick="testEndpoint('/health', 'GET')">Test</button>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <strong>/api/system</strong> - System information
+                <button onclick="testEndpoint('/api/system', 'GET')">Test</button>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <strong>/api/users</strong> - Get all users
+                <button onclick="testEndpoint('/api/users', 'GET')">Test</button>
+            </div>
+
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <strong>/api/users</strong> - Create new user
+                <button onclick="createUser()">Test</button>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <strong>/api/todos</strong> - Get all todos
+                <button onclick="testEndpoint('/api/todos', 'GET')">Test</button>
+            </div>
+
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <strong>/api/todos</strong> - Create new todo
+                <button onclick="createTodo()">Test</button>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <strong>/api/files</strong> - List application files
+                <button onclick="testEndpoint('/api/files', 'GET')">Test</button>
+            </div>
+
+            <div id="api-response" class="response" style="display: none;"></div>
+        </div>
+
+        <div class="card">
+            <h2>🐋 Docker Commands</h2>
+            <p>Use these commands to work with the Docker container:</p>
+            
+            <div class="endpoint">
+                <strong>Build the image:</strong><br>
+                <code>docker build -t docker-learning-server .</code>
+            </div>
+
+            <div class="endpoint">
+                <strong>Run the container:</strong><br>
+                <code>docker run -p 3000:3000 docker-learning-server</code>
+            </div>
+
+            <div class="endpoint">
+                <strong>Run with Docker Compose:</strong><br>
+                <code>docker-compose up -d</code>
+            </div>
+
+            <div class="endpoint">
+                <strong>View logs:</strong><br>
+                <code>docker logs docker-learning-server</code>
+            </div>
+
+            <div class="endpoint">
+                <strong>Stop the container:</strong><br>
+                <code>docker stop docker-learning-server</code>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check health on page load
+        window.onload = function() {
+            checkHealth();
+        };
+
+        async function checkHealth() {
+            try {
+                const response = await fetch('/health');
+                const data = await response.json();
+                
+                const statusElement = document.getElementById('health-status');
+                if (response.ok) {
+                    statusElement.innerHTML = `
+                        <span class="status healthy">✅ Healthy</span><br>
+                        <small>Uptime: ${Math.floor(data.uptime)} seconds</small>
+                    `;
+                } else {
+                    statusElement.innerHTML = '<span class="status error">❌ Unhealthy</span>';
+                }
+            } catch (error) {
+                document.getElementById('health-status').innerHTML = '<span class="status error">❌ Connection Failed</span>';
+            }
+        }
+
+        async function getSystemInfo() {
+            await testEndpoint('/api/system', 'GET', 'system-response');
+        }
+
+        async function testEndpoint(endpoint, method, responseId = 'api-response') {
+            const responseElement = document.getElementById(responseId);
+            responseElement.style.display = 'block';
+            responseElement.textContent = 'Loading...';
+
+            try {
+                const response = await fetch(endpoint, { method });
+                const data = await response.json();
+                responseElement.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                responseElement.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        async function createUser() {
+            const responseElement = document.getElementById('api-response');
+            responseElement.style.display = 'block';
+            responseElement.textContent = 'Creating user...';
+
+            try {
+                const response = await fetch('/api/users', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: 'Test User',
+                        email: `test${Date.now()}@example.com`
+                    })
+                });
+                const data = await response.json();
+                responseElement.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                responseElement.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        async function createTodo() {
+            const responseElement = document.getElementById('api-response');
+            responseElement.style.display = 'block';
+            responseElement.textContent = 'Creating todo...';
+
+            try {
+                const response = await fetch('/api/todos', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        title: `Learn Docker - ${new Date().toLocaleTimeString()}`,
+                        userId: '1'
+                    })
+                });
+                const data = await response.json();
+                responseElement.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                responseElement.textContent = `Error: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>

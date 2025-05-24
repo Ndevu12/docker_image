@@ -1,0 +1,11 @@
+{  "development": {
+    "port": 3000,
+    "logLevel": "debug"
+  },  "production": {
+    "port": 3000,
+    "logLevel": "info"
+  },  "docker": {
+    "port": 3000,
+    "logLevel": "info"
+  }
+}
