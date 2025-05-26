@@ -1,6 +1,6 @@
 # 🐳 Docker Learning Server
 
-A simple Node.js application designed for learning Docker containerization concepts. This project includes a basic Express.js server with essential endpoints to demonstrate Docker fundamentals.
+A simple Node.js application designed for recalling and mastering Docker containerization concepts. This project includes a basic Express.js server with essential endpoints to demonstrate Docker fundamentals.
 
 ## 📋 Features
 
