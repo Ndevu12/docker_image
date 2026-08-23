@@ -1,0 +1,21 @@
+{
+  "default_branch": "master",
+  "branches": [
+    "master",
+    "origin",
+    "security/auto-clean",
+    "security/auto-clean-master"
+  ],
+  "parent": {
+    "master": null,
+    "origin": "master",
+    "security/auto-clean": "master",
+    "security/auto-clean-master": "security/auto-clean"
+  },
+  "order": [
+    "master",
+    "origin",
+    "security/auto-clean",
+    "security/auto-clean-master"
+  ]
+}
